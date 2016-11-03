@@ -50,13 +50,15 @@
   <div class="memo">
   <button type="submit" value="delete" >
   <div class="row">
-  <div class="col-md-2">
+  <div class="col-md-3">
   
     {{ memo.date | humanize }}
+  <input type="hidden" name="date" value="{{ memo.date }}"/>	
   </div>
   <div class="col-md-10">
-  <input type="hidden" name="memo" value={{ memo }} />
+  
     {{ memo.text }}
+  <input type="hidden" name="memo" value="{{ memo.text }}"/>	
   </div>
 	
   </div> <!-- row -->

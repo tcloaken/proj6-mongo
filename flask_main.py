@@ -95,7 +95,8 @@ def memo_cancel():
 def del_memo():
     app.logger.debug("memo deleted")
     text = request.args.get("memo", type=str)
-    delete_memo(text)
+    date = request.args.get("date", type=str)
+    delete_memo(text,date)
     return index()
     
     
@@ -127,15 +128,18 @@ def humanize_arrow_date( date ):
     Arrow will try to humanize down to the minute, so we
     need to catch 'today' as a special case. 
     """
+    date = arrow.get(date).date()
     try:
-        then = arrow.get(date).to('local')
-        now = arrow.utcnow().to('local')
-        if then.date() == now.date():
+        then = date
+        now = arrow.utcnow().date()
+        if then == now:
             human = "Today"
         else: 
             human = then.humanize(now)
             if human == "in a day":
                 human = "Tomorrow"
+            elif human == "a day ago":
+                human = "Yesterday"
             
     except: 
         human = date
@@ -154,7 +158,7 @@ def get_memos():
     """
     records = [ ]
     for record in collection.find( { "type": "dated_memo" } ):
-        record['date'] = arrow.get(record['date']).isoformat()
+        #record['date'] = arrow.get(record['date']).isoformat()
         del record['_id']
         records.append(record)
     return records 
@@ -166,24 +170,29 @@ def add_memo(date,text):
     adds memo to the database
     Returns nothing
     """
+    d = arrow.get(date).isoformat()
     record = { "type": "dated_memo", 
-           "date":  date,
+           "date":  d,
            "text": text
           }
     collection.insert( record )
     return
 
-def delete_memo(text):
+def delete_memo(text,date):
     """
     Args:  
            text -what the memo says
     deletes a memo
     Returns nothing
     """
-    record = collection.find({ "type": "dated_memo", 
-           "type": { "$eq: text" }} )
-          
-    collection.remove(record)
+    
+    for record in collection.find( { "type": "dated_memo" } ):
+        if(record['text'] == text) and (record['date'] == date):
+            collection.remove(record)
+            break
+        else:
+            continue
+    
     return
     
 if __name__ == "__main__":
