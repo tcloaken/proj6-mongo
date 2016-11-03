@@ -42,8 +42,9 @@
 	<input type="submit" value="New Memo">
 </form>
 <br><br>
-<h3>Click on a memo to delete it</h3>
+
 {% if g.memos %}
+<h3>Click on a memo to delete it</h3>
     {% for memo in g.memos %}
   <form action="/del_memo"> 
   
