@@ -27,6 +27,7 @@ import arrow    # Replacement for datetime, based on moment.js
 from dateutil import tz  # For interpreting local times
 
 # Mongo database
+import pymongo
 from pymongo import MongoClient
 import secrets.admin_secrets
 import secrets.client_secrets
@@ -72,13 +73,38 @@ def index():
   return flask.render_template('index.html')
 
 
-# We don't have an interface for creating memos yet
-# @app.route("/create")
-# def create():
-#     app.logger.debug("Create")
-#     return flask.render_template('create.html')
 
 
+@app.route("/memo_submit")
+def memo_submit():
+    app.logger.debug("memo submit")
+    text = request.args.get("memo", type=str)
+    date = request.args.get("date", type=str)
+    add_memo(date, text)
+    
+    return index()
+
+    
+
+@app.route("/memo_cancel")
+def memo_cancel():
+    app.logger.debug("memo cancelled")
+    return index()
+
+@app.route("/del_memo")
+def del_memo():
+    app.logger.debug("memo deleted")
+    text = request.args.get("memo", type=str)
+    delete_memo(text)
+    return index()
+    
+    
+@app.route("/new_memo")
+def new_memo():
+    app.logger.debug("new memo")
+    return flask.render_template('create.html')
+
+    
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
@@ -110,6 +136,7 @@ def humanize_arrow_date( date ):
             human = then.humanize(now)
             if human == "in a day":
                 human = "Tomorrow"
+            
     except: 
         human = date
     return human
@@ -132,7 +159,33 @@ def get_memos():
         records.append(record)
     return records 
 
+def add_memo(date,text):
+    """
+    Args:  date -the date of memo
+           text -what the memo says
+    adds memo to the database
+    Returns nothing
+    """
+    record = { "type": "dated_memo", 
+           "date":  date,
+           "text": text
+          }
+    collection.insert( record )
+    return
 
+def delete_memo(text):
+    """
+    Args:  
+           text -what the memo says
+    deletes a memo
+    Returns nothing
+    """
+    record = collection.find({ "type": "dated_memo", 
+           "type": { "$eq: text" }} )
+          
+    collection.remove(record)
+    return
+    
 if __name__ == "__main__":
     app.debug=CONFIG.DEBUG
     app.logger.setLevel(logging.DEBUG)

@@ -5,11 +5,11 @@ outside of Flask.
 We want to open our MongoDB database,
 insert some memos, and read them back
 """
-
+import sys
 import pymongo
 from pymongo import MongoClient
 import arrow
-import sys
+
 
 import secrets.admin_secrets
 import secrets.client_secrets

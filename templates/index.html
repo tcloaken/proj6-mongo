@@ -25,6 +25,7 @@
 <body>
 <div class="container">
 
+
 <!-- Flashed messages before content -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -37,19 +38,30 @@
 {% endwith %}
 
 <h1>Memos</h1>
-
+<form action="/new_memo">
+	<input type="submit" value="New Memo">
+</form>
+<br><br>
+<h3>Click on a memo to delete it</h3>
 {% if g.memos %}
     {% for memo in g.memos %}
+  <form action="/del_memo"> 
+  
   <div class="memo">
+  <button type="submit" value="delete" >
   <div class="row">
   <div class="col-md-2">
+  
     {{ memo.date | humanize }}
   </div>
   <div class="col-md-10">
+  <input type="hidden" name="memo" value={{ memo }} />
     {{ memo.text }}
   </div>
+	
   </div> <!-- row -->
   </div> <!-- memo -->
+  </form>
   {% endfor %}
 {% else %}
   <p>No memos for you. </p>  
