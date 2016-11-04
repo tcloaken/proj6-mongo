@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Create Memo</title>
+
+  <!-- 'viewport' is used by bootstrap to respond to device size -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+  <script
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+  </script>
+
+  <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+  <link rel="stylesheet"
+   href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+   <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
+   </script>
+
+  <!-- moment.js is the JavaScript equivalent of arrow.py -->
+  <script 
+    src="{{ url_for('static', filename="js/moment.min.js") }}"></script>
+
+</head>
+
+   <!-- Our own style sheet -->
+   <link rel="stylesheet" href="/static/css/create.css" />
+
+<body>
+<!-- bootstrap requires a 'container' div around content -->
+<div class="container">
+
+<h1>Memo Creator</h1>
+  <p>Insert a date and something to say</p>
+
+  <!--
+  -- If there are any warnings or other messages from a prior
+  -- request to the server, 
+  -- they appear above the rest of the content, just until the next 
+  -- action.  (This is only on request/response transactions that
+  -- result in regenerating the page, not on every xmlhttp request.) 
+  -->
+
+
+  
+  
+
+<form  action="/memo_submit" id="memoform">
+   <div class="col-md-6">
+    <label>Date: yyyy-mm-dd</label>
+    <input type=date name="date" id="date" value="2016-11-01" />
+  </div> 
+  <textarea rows="4" cols="50" id="memo" name="memo" form="memoform">
+Enter text here...</textarea>
+  <br><br>
+  <input type="submit" value="Submit">
+</form> 
+<form action="/memo_cancel">
+  <input type="submit" value="Cancel">
+</form>
+
+
+<script>
+	function new_memo() {
+	var txt = $("#memo").val();
+	var d = $("#date").val();
+    var date = new Date(d);
+    var n = date.toISOString();
+    $.getJSON("/memo_submit", { date: date , text: txt}, function(){} );
+}
+</script>
+
+</div>
+</body> </html>
