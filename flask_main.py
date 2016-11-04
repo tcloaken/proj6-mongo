@@ -1,3 +1,4 @@
+
 """
 Flask web app connects to Mongo database.
 Keep a simple list of dated memoranda.
@@ -63,6 +64,7 @@ except:
 # Pages
 ###
 
+#main page that displays memos
 @app.route("/")
 @app.route("/index")
 def index():
@@ -73,33 +75,7 @@ def index():
   return flask.render_template('index.html')
 
 
-
-
-@app.route("/memo_submit")
-def memo_submit():
-    app.logger.debug("memo submit")
-    text = request.args.get("memo", type=str)
-    date = request.args.get("date", type=str)
-    add_memo(date, text)
-    
-    return index()
-
-    
-
-@app.route("/memo_cancel")
-def memo_cancel():
-    app.logger.debug("memo cancelled")
-    return index()
-
-@app.route("/del_memo")
-def del_memo():
-    app.logger.debug("memo deleted")
-    text = request.args.get("memo", type=str)
-    date = request.args.get("date", type=str)
-    delete_memo(text,date)
-    return index()
-    
-    
+ #redirects to new memo creator page   
 @app.route("/new_memo")
 def new_memo():
     app.logger.debug("new memo")
@@ -113,6 +89,39 @@ def page_not_found(error):
                                  badurl=request.base_url,
                                  linkback=url_for("index")), 404
 
+                                 
+####
+# Redirects to pages
+####                                     
+                                 
+                                 
+#gets args to create memo and calls add_memo() then return index()
+@app.route("/memo_submit")
+def memo_submit():
+    app.logger.debug("memo submit")
+    text = request.args.get("memo", type=str)
+    date = request.args.get("date", type=str)
+    add_memo(date, text)
+    
+    return index()
+
+
+#returns index() from cancelling out of creating a new memo
+@app.route("/memo_cancel")
+def memo_cancel():
+    app.logger.debug("memo cancelled")
+    return index()
+
+ #gets args and calls delete_memo() and then returns index()
+@app.route("/del_memo")
+def del_memo():
+    app.logger.debug("memo deleted")
+    text = request.args.get("memo", type=str)
+    date = request.args.get("date", type=str)
+    delete_memo(text,date)
+    return index()
+    
+    
 #################
 #
 # Functions used within the templates
@@ -128,18 +137,20 @@ def humanize_arrow_date( date ):
     Arrow will try to humanize down to the minute, so we
     need to catch 'today' as a special case. 
     """
-    date = arrow.get(date).date()
+    date = arrow.get(date).floor("day")
     try:
         then = date
-        now = arrow.utcnow().date()
+        now = arrow.utcnow().floor("day")
         if then == now:
             human = "Today"
         else: 
-            human = arrow.get(then).humanize(now)
+            human = then.humanize(now)
             if human == "in a day":
                 human = "Tomorrow"
             elif human == "a day ago":
                 human = "Yesterday"
+            elif human == "in 2 days":
+                human = "Day after tomorrow"
             
     except: 
         human = date
@@ -165,7 +176,7 @@ def get_memos():
 
 def sortdate(el):
     """
-    returns a key in dict el
+    returns a value from dict el of key "date"
     """
     return el["date"]
     
@@ -174,7 +185,7 @@ def add_memo(date,text):
     Args:  date -the date of memo
            text -what the memo says
     adds memo to the database
-    Returns nothing
+    Returns added memo record
     """
     d = arrow.get(date).isoformat()
     record = { "type": "dated_memo", 
@@ -182,7 +193,7 @@ def add_memo(date,text):
            "text": text
           }
     collection.insert( record )
-    return
+    return record
 
 def delete_memo(text,date):
     """
@@ -199,7 +210,7 @@ def delete_memo(text,date):
         else:
             continue
     
-    return
+    return 
     
 if __name__ == "__main__":
     app.debug=CONFIG.DEBUG
