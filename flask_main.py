@@ -166,6 +166,7 @@ def get_memos():
     """
     Returns all memos in the database, in a form that
     can be inserted directly in the 'session' object.
+	Also sorted by date via sorted()
     """
     records = [ ]
     for record in collection.find( { "type": "dated_memo" } ):

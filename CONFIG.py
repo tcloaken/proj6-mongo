@@ -1,11 +1,11 @@
 """
 Configuration of memo app. 
-Generated Wed Nov  2 18:29:22 PDT 2016
+Generated Thu Nov  3 22:30:10 PDT 2016
 Edit to fit development or deployment environment.
 
 """
 
 PORT=5000
 DEBUG = True  # Set to False for production use
-secret_key="de6a6a82b2e06e8e0ac7ab74f548d174"
+secret_key="8b12aaf0000244d745a32cdcc4eb8dc5"
 
